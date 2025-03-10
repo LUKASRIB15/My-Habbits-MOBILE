@@ -2,6 +2,7 @@ import { ComponentType } from "react";
 import { ActivityIndicator, Text, TextProps, TouchableOpacity, TouchableOpacityProps } from "react-native";
 import colors from 'tailwindcss/colors'
 import {IconProps as PhosphorIconProps} from "phosphor-react-native"
+import { twMerge } from "tailwind-merge";
 
 type ButtonProps = TouchableOpacityProps & {
   isLoading?: boolean
@@ -10,7 +11,10 @@ type ButtonProps = TouchableOpacityProps & {
 function Button({children, isLoading=false, ...rest}: ButtonProps){
   return (
     <TouchableOpacity
-      className="bg-blue-600 rounded-md p-4 items-center"
+      className={twMerge(
+        "bg-blue-600 rounded-md p-4 items-center",
+        (isLoading || rest.disabled) && "opacity-70"
+      )}
       activeOpacity={0.7}
       {...rest}
     >
