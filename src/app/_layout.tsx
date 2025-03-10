@@ -4,6 +4,7 @@ import { useFonts } from "expo-font"
 import { Stack } from "expo-router"
 import '../global.css'
 import { StatusBar } from "expo-status-bar"
+import { View } from "react-native"
 
 export default function Layout(){
   const [isFontsLoaded] = useFonts({
@@ -19,11 +20,11 @@ export default function Layout(){
     }
 
   return (
-    <>
+    <View className="flex-1 bg-slate-950">
       <Stack 
         screenOptions={{
           animation: 'ios_from_right',
-          headerShown: false
+          headerShown: false,
         }}
       />
       <StatusBar 
@@ -32,6 +33,6 @@ export default function Layout(){
         animated 
         translucent
       />
-    </>
+    </View>
   )
 }

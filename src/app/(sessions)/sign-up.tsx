@@ -1,39 +1,41 @@
 import { ImageBackground, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import LogoSvg from '@/assets/logo.svg'
-import { LinearGradient } from "expo-linear-gradient";
-import { Input } from "@/components/input";
-import { ArrowRight, Envelope, LockKey } from "phosphor-react-native";
-import { Button } from "@/components/button";
-import colors from 'tailwindcss/colors'
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { LinearGradient } from "expo-linear-gradient";
 import { Controller, useForm } from "react-hook-form";
-import * as zod from 'zod'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useRef } from "react";
+import { Input } from "@/components/input";
+import { ArrowLeft, ArrowRight, Envelope, LockKey, User } from "phosphor-react-native";
+import { Button } from "@/components/button";
+import colors from "tailwindcss/colors";
+import * as zod from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
+import { useRef } from "react";
 
 const APP_BAR = 50
 
-const signInFormSchema = zod.object({
+const signUpFormSchema = zod.object({
+  name: zod.string().min(3, 'O nome deve conter no mínimo 3 caracteres.'),
   email: zod.string().email('Email inválido.'),
   password: zod.string().min(6, 'A senha deve conter no mínimo 6 caracteres.'),
 })
 
-type SignInFormData = zod.infer<typeof signInFormSchema>
+type SignUpFormData = zod.infer<typeof signUpFormSchema>
 
-export default function SignIn(){
+export default function SignUp() {
   const router = useRouter()
+  const nameInputRef = useRef<TextInput>(null)
   const emailInputRef = useRef<TextInput>(null)
   const passwordInputRef = useRef<TextInput>(null)
   const screenHeight = useWindowDimensions().height
 
-  const {control, handleSubmit, formState: {errors}, watch} = useForm<SignInFormData>({
-    resolver: zodResolver(signInFormSchema)
+  const {control, handleSubmit, watch, formState: {errors}} = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpFormSchema)
   })
 
-  const isInvalidForm = !watch('email') || !watch('password')
+  const isInvalidForm = !watch('name') ||!watch('email') || !watch('password') 
 
-  function handleSignIn(data: SignInFormData){
+  function handleSignUp(data: SignUpFormData){
     console.log(data)
   }
 
@@ -48,7 +50,7 @@ export default function SignIn(){
       {/* Main */}
       <KeyboardAwareScrollView >
         <ImageBackground 
-          source={require('@/assets/illustration-signin.png')} 
+          source={require('@/assets/illustration-signup.png')} 
           className="flex-1"
           style={{height: screenHeight - APP_BAR}}
         >
@@ -56,12 +58,28 @@ export default function SignIn(){
             colors={['rgba(2, 6, 23, 0.1)','#020617', '#020617']}
             className="flex-1 justify-end"
           >
-            <View className=" min-h-[436] items-center justify-between mx-5 mb-10">
+            <View className=" min-h-[536] items-center justify-between mx-5 mb-10">
               <View className="gap-y-8">
                 <View className="space-y-2">
-                  <Text className="text-slate-100 text-4xl font-rajdhani-medium text-center">Conecte-se e organize {'\n'}os seus hábitos!</Text>
-                  <Text className="text-slate-100 text-base font-inter-normal text-center">Crie tarefas diárias e analise seu desempenho</Text>
+                  <Text className="text-slate-100 text-4xl font-rajdhani-medium text-center">Cadastre-se e inicie sua jornada!</Text>
+                  <Text className="text-slate-100 text-base font-inter-normal text-center">Crie tarefas e monte sua jornada para atingir seu objetivo </Text>
                 </View>
+                <Controller
+                  name="name"
+                  control={control} 
+                  render={({field}) =>(
+                    <Input
+                      ref={nameInputRef}
+                      onSubmitEditing={() => emailInputRef.current?.focus()}
+                      returnKeyType="next"
+                      placeholder="Nome" 
+                      icon={User}
+                      value={field.value}
+                      onChangeText={field.onChange}
+                      errorMessage={errors.name?.message}
+                    />
+                  )}
+                />
                 <Controller
                   name="email"
                   control={control} 
@@ -88,7 +106,7 @@ export default function SignIn(){
                       ref={passwordInputRef}
                       secureTextEntry
                       returnKeyType="send"
-                      onSubmitEditing={handleSubmit(handleSignIn)} 
+                      onSubmitEditing={handleSubmit(handleSignUp)} 
                       placeholder="Senha"
                       icon={LockKey}
                       value={field.value}
@@ -98,18 +116,18 @@ export default function SignIn(){
                   )}
                 />
                 <Button 
-                  onPress={handleSubmit(handleSignIn)}
+                  onPress={handleSubmit(handleSignUp)}
                   disabled={isInvalidForm}
                 >
-                  <Button.Title>Acessar painel</Button.Title>
+                  <Button.Title>Criar minha conta</Button.Title>
                 </Button>
               </View>
               <TouchableOpacity 
-                onPress={()=> router.navigate('/sign-up')}
+                onPress={()=> router.back()}
                 className="flex-row items-center gap-x-1"
               >
-                <Text className="text-slate-100 font-inter-normal">Quero me cadastrar e iniciar minha jornada</Text>
-                <ArrowRight color={colors.slate[100]} size={14}/>
+                <ArrowLeft color={colors.slate[100]} size={14}/>
+                <Text className="text-slate-100 font-inter-normal">Quero entrar e continuar minha jornada</Text>
               </TouchableOpacity>
             </View>
           </LinearGradient>
