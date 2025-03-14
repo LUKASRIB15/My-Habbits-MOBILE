@@ -1,8 +1,9 @@
 import { Text, TextInput, TextInputProps, View } from "react-native";
 import { IconProps} from 'phosphor-react-native'
 import colors from 'tailwindcss/colors'
-import { ComponentType, forwardRef, useState } from "react";
+import { ComponentType, forwardRef, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 type InputProps = TextInputProps & {
   errorMessage?: string | null
@@ -12,9 +13,32 @@ type InputProps = TextInputProps & {
 
 export const Input = forwardRef<TextInput, InputProps>(({placeholder, errorMessage=null, icon: Icon, ...rest}, ref)=>{
   const [isFocused, setIsFocused] = useState(false)
+  const shake = useSharedValue(0)
+
+  const animatedShakeStyle = useAnimatedStyle(() => ({
+    transform: [{
+      translateX: shake.value
+    }]
+  }))
+
+  function toShakeAnimation(){
+    shake.value = withSequence(
+      withTiming(-10, {duration: 100}),
+      withTiming(10, {duration: 100}),
+      withTiming(-10, {duration: 100}),
+      withTiming(10, {duration: 100}),
+      withTiming(0, {duration: 100})
+    )
+  }
+
+  useEffect(() => {
+    if(errorMessage && !isFocused){
+      toShakeAnimation()
+    }
+  }, [errorMessage])
 
   return (
-    <View className="gap-y-1">
+    <Animated.View className="gap-y-1" style={animatedShakeStyle}>
       <View 
         className={twMerge(
           "flex-row items-center gap-x-4 border-2 border-slate-100 rounded-md px-4",
@@ -36,5 +60,5 @@ export const Input = forwardRef<TextInput, InputProps>(({placeholder, errorMessa
       {
         errorMessage && !isFocused && <Text className="text-red-500 text-sm">{errorMessage}</Text>
       }
-    </View>
+    </Animated.View>
   )})

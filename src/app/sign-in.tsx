@@ -15,6 +15,7 @@ import { AxiosError } from "axios";
 import Toast from "react-native-toast-message"
 import { ToastMessage } from "@/components/toast-message";
 import { useSessions } from "@/contexts/sessions";
+import * as Haptics from "expo-haptics"
 
 const APP_BAR = 50
 
@@ -33,14 +34,16 @@ export default function SignIn(){
   const passwordInputRef = useRef<TextInput>(null)
   const screenHeight = useWindowDimensions().height
 
-  const {control, handleSubmit, formState: {errors}, watch} = useForm<SignInFormData>({
+  const {control, handleSubmit, formState: {errors}, watch, reset} = useForm<SignInFormData>({
     resolver: zodResolver(signInFormSchema)
   })
 
   const isInvalidForm = !watch('email') || !watch('password')
 
   async function handleSignIn(data: SignInFormData){
-    
+    await Haptics.notificationAsync(
+      Haptics.NotificationFeedbackType.Success
+    )
     try{
       setIsLoading(true)
       const {email, password} = data
@@ -49,6 +52,8 @@ export default function SignIn(){
     }catch(error){
       if(error instanceof AxiosError){
         const status = error.response?.status ?? 500
+
+        console.log(error.toJSON())
 
         switch(status){
           case 401:
@@ -67,6 +72,7 @@ export default function SignIn(){
       }
     }finally{
       setIsLoading(false)
+      reset()
     }
   }
 

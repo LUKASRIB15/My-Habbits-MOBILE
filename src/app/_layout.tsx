@@ -5,6 +5,8 @@ import { Slot } from "expo-router"
 import '../global.css'
 import { StatusBar } from "expo-status-bar"
 import { SessionsProvider } from "@/contexts/sessions"
+import { Loading } from "@/components/loading"
+import { View } from "react-native"
 
 export default function Layout(){
   const [isFontsLoaded] = useFonts({
@@ -15,19 +17,20 @@ export default function Layout(){
   })
   
   if(!isFontsLoaded){
-    // TODO: Loading screen
-    return null
+    return <Loading />
   }
 
   return (
     <SessionsProvider>
-      <Slot />
-      <StatusBar 
-        style="light"
-        backgroundColor="transparent" 
-        animated 
-        translucent
-      />
+      <View className="flex-1 bg-slate-950">
+        <Slot/>
+        <StatusBar 
+          style="light"
+          backgroundColor="transparent" 
+          animated 
+          translucent
+        />
+      </View>
     </SessionsProvider>
   )
 }
