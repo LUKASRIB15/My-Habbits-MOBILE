@@ -10,7 +10,11 @@ import colors from "tailwindcss/colors";
 import * as zod from "zod"
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import Toast from "react-native-toast-message";
+import { ToastMessage } from "@/components/toast-message";
+import { useSessions } from "@/contexts/sessions";
+import { AxiosError } from "axios";
 
 const APP_BAR = 50
 
@@ -23,6 +27,8 @@ const signUpFormSchema = zod.object({
 type SignUpFormData = zod.infer<typeof signUpFormSchema>
 
 export default function SignUp() {
+  const [isLoading, setIsLoading] = useState(false)
+  const {signUp} = useSessions()
   const router = useRouter()
   const nameInputRef = useRef<TextInput>(null)
   const emailInputRef = useRef<TextInput>(null)
@@ -35,8 +41,36 @@ export default function SignUp() {
 
   const isInvalidForm = !watch('name') ||!watch('email') || !watch('password') 
 
-  function handleSignUp(data: SignUpFormData){
-    console.log(data)
+  async function handleSignUp(data: SignUpFormData){
+    
+    try{
+      setIsLoading(true)
+      const {name, email, password} = data
+
+      await signUp(name, email, password)
+      router.replace('/')
+    }catch(error){
+      if(error instanceof AxiosError){
+        const status = error.response?.status ?? 500
+
+        switch(status){
+          case 409:
+            Toast.show({
+              type: 'error',
+              text1: 'Já existe uma conta com este e-mail. Tente outro endereço ou faça login.',
+            })
+            break
+          default:
+            Toast.show({
+              type: 'error',
+              text1: 'Ops! Ocorreu um erro ao criar sua conta, tente novamente mais tarde',
+            })
+        }
+        
+      }
+    }finally{
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -118,6 +152,7 @@ export default function SignUp() {
                 <Button 
                   onPress={handleSubmit(handleSignUp)}
                   disabled={isInvalidForm}
+                  isLoading={isLoading}
                 >
                   <Button.Title>Criar minha conta</Button.Title>
                 </Button>
@@ -133,6 +168,12 @@ export default function SignUp() {
           </LinearGradient>
         </ImageBackground>
       </KeyboardAwareScrollView>
+      {/* Toast Notification */}
+      <Toast 
+        config={{
+          error: (props)=><ToastMessage message={props.text1}/>
+        }}
+      />
     </View>
   )
 }
