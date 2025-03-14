@@ -15,6 +15,7 @@ import Toast from "react-native-toast-message";
 import { ToastMessage } from "@/components/toast-message";
 import { useSessions } from "@/contexts/sessions";
 import { AxiosError } from "axios";
+import * as Haptics from "expo-haptics"
 
 const APP_BAR = 50
 
@@ -35,14 +36,16 @@ export default function SignUp() {
   const passwordInputRef = useRef<TextInput>(null)
   const screenHeight = useWindowDimensions().height
 
-  const {control, handleSubmit, watch, formState: {errors}} = useForm<SignUpFormData>({
+  const {control, handleSubmit, watch, formState: {errors}, reset} = useForm<SignUpFormData>({
     resolver: zodResolver(signUpFormSchema)
   })
 
   const isInvalidForm = !watch('name') ||!watch('email') || !watch('password') 
 
   async function handleSignUp(data: SignUpFormData){
-    
+    await Haptics.notificationAsync(
+      Haptics.NotificationFeedbackType.Success
+    )
     try{
       setIsLoading(true)
       const {name, email, password} = data
@@ -70,6 +73,7 @@ export default function SignUp() {
       }
     }finally{
       setIsLoading(false)
+      reset()
     }
   }
 

@@ -1,3 +1,4 @@
+import { Loading } from "@/components/loading";
 import { useSessions } from "@/contexts/sessions";
 import { Redirect, Stack } from "expo-router";
 import { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ export default function AppLayout() {
   }, []);
 
   if (isLoading) {
-    return <Text>Loading...</Text>; 
+    return <Loading />; 
   }
 
   if(!userLogged){
