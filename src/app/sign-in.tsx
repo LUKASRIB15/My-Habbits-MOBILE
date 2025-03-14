@@ -9,8 +9,12 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { Controller, useForm } from "react-hook-form";
 import * as zod from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "expo-router";
+import { AxiosError } from "axios";
+import Toast from "react-native-toast-message"
+import { ToastMessage } from "@/components/toast-message";
+import { useSessions } from "@/contexts/sessions";
 
 const APP_BAR = 50
 
@@ -22,6 +26,8 @@ const signInFormSchema = zod.object({
 type SignInFormData = zod.infer<typeof signInFormSchema>
 
 export default function SignIn(){
+  const [isLoading, setIsLoading] = useState(false)
+  const {signIn} = useSessions()
   const router = useRouter()
   const emailInputRef = useRef<TextInput>(null)
   const passwordInputRef = useRef<TextInput>(null)
@@ -33,8 +39,35 @@ export default function SignIn(){
 
   const isInvalidForm = !watch('email') || !watch('password')
 
-  function handleSignIn(data: SignInFormData){
-    console.log(data)
+  async function handleSignIn(data: SignInFormData){
+    
+    try{
+      setIsLoading(true)
+      const {email, password} = data
+      await signIn(email, password)
+      router.replace('/')
+    }catch(error){
+      if(error instanceof AxiosError){
+        const status = error.response?.status ?? 500
+
+        switch(status){
+          case 401:
+            Toast.show({
+              type: 'error',
+              text1: 'Seu email ou senha estão incorretos',
+            })
+            break
+          default:
+            Toast.show({
+              type: 'error',
+              text1: 'Ops! Ocorreu um erro ao fazer login, tente novamente mais tarde',
+            })
+        }
+        
+      }
+    }finally{
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -100,6 +133,7 @@ export default function SignIn(){
                 <Button 
                   onPress={handleSubmit(handleSignIn)}
                   disabled={isInvalidForm}
+                  isLoading={isLoading}
                 >
                   <Button.Title>Acessar painel</Button.Title>
                 </Button>
@@ -115,6 +149,12 @@ export default function SignIn(){
           </LinearGradient>
         </ImageBackground>
       </KeyboardAwareScrollView>
+      {/* Toast Notification */}
+      <Toast 
+        config={{
+          error: (props)=><ToastMessage message={props.text1}/>
+        }}
+      />
     </View>
   )
 }
