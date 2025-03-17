@@ -53,8 +53,6 @@ export default function SignIn(){
       if(error instanceof AxiosError){
         const status = error.response?.status ?? 500
 
-        console.log(error.toJSON())
-
         switch(status){
           case 401:
             Toast.show({
@@ -116,6 +114,7 @@ export default function SignIn(){
                       value={field.value}
                       onChangeText={field.onChange}
                       errorMessage={errors.email?.message}
+                      testID="email-input"
                     />
                   )}
                 />
@@ -133,6 +132,7 @@ export default function SignIn(){
                       value={field.value}
                       onChangeText={field.onChange}
                       errorMessage={errors.password?.message}
+                      testID="password-input"
                     />
                   )}
                 />
@@ -140,6 +140,7 @@ export default function SignIn(){
                   onPress={handleSubmit(handleSignIn)}
                   disabled={isInvalidForm}
                   isLoading={isLoading}
+                  testID="sign-in-button"
                 >
                   <Button.Title>Acessar painel</Button.Title>
                 </Button>
@@ -147,6 +148,7 @@ export default function SignIn(){
               <TouchableOpacity 
                 onPress={()=> router.navigate('/sign-up')}
                 className="flex-row items-center gap-x-1"
+                testID="go-to-sign-up-button"
               >
                 <Text className="text-slate-100 font-inter-normal">Quero me cadastrar e iniciar minha jornada</Text>
                 <ArrowRight color={colors.slate[100]} size={14}/>

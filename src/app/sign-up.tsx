@@ -115,6 +115,7 @@ export default function SignUp() {
                       value={field.value}
                       onChangeText={field.onChange}
                       errorMessage={errors.name?.message}
+                      testID="name-input"
                     />
                   )}
                 />
@@ -133,6 +134,7 @@ export default function SignUp() {
                       value={field.value}
                       onChangeText={field.onChange}
                       errorMessage={errors.email?.message}
+                      testID="email-input"
                     />
                   )}
                 />
@@ -150,6 +152,7 @@ export default function SignUp() {
                       value={field.value}
                       onChangeText={field.onChange}
                       errorMessage={errors.password?.message}
+                      testID="password-input"
                     />
                   )}
                 />
@@ -157,6 +160,7 @@ export default function SignUp() {
                   onPress={handleSubmit(handleSignUp)}
                   disabled={isInvalidForm}
                   isLoading={isLoading}
+                  testID="sign-up-button"
                 >
                   <Button.Title>Criar minha conta</Button.Title>
                 </Button>

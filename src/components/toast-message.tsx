@@ -6,8 +6,12 @@ type ToastMessageProps = {
   message: string | undefined
 }
 
-export function ToastMessage({message=""}: ToastMessageProps){
+export function ToastMessage({message}: ToastMessageProps){
   const screenWidth = useWindowDimensions().width
+
+  if(!message){
+    return null
+  }
 
   return (
     <View className="px-4 py-6 rounded-xl bg-red-950 gap-x-2 flex-row mt-16" style={{width: screenWidth - MARGIN_AXLE_X}}>

@@ -39,18 +39,20 @@ export const Input = forwardRef<TextInput, InputProps>(({placeholder, errorMessa
 
   return (
     <Animated.View className="gap-y-1" style={animatedShakeStyle}>
-      <View 
+      <View
+        testID="input-container" 
         className={twMerge(
           "flex-row items-center gap-x-4 border-2 border-slate-100 rounded-md px-4",
           errorMessage && ' border-red-500',
           isFocused && ' border-blue-600'
         )}
       >
-        <Icon size={20} color={colors.slate[100]}/>
+        <Icon size={20} color={colors.slate[100]} testID="input-icon"/>
         <TextInput
           ref={ref}
+          testID="input"
           placeholder={placeholder}
-          className="flex-1 max-h-12 text-slate-100"
+          className="flex-1 min-h-12 text-slate-100"
           placeholderTextColor={colors.slate[100]}
           onBlur={()=> setIsFocused(false)}
           onFocus={() => setIsFocused(true)}
@@ -58,7 +60,7 @@ export const Input = forwardRef<TextInput, InputProps>(({placeholder, errorMessa
         />
       </View>
       {
-        errorMessage && !isFocused && <Text className="text-red-500 text-sm">{errorMessage}</Text>
+        errorMessage && !isFocused && <Text testID="message-error-text" className="text-red-500 text-sm">{errorMessage}</Text>
       }
     </Animated.View>
   )})

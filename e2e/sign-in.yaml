@@ -1,0 +1,27 @@
+# SIGN IN STEPS
+# [x] Launch the app with app running
+# [x] Click in email input
+# [x] Type email
+# [x] Scroll vertically
+# [x] Click in password input
+# [x] Type password
+# [x] Click in "access dashboard" button
+# [x] Assert "Logout" button
+
+appId: com.myHabbits.app
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    stopApp: false
+- tapOn:
+    id: email-input
+- inputText: "test@email.com"
+- scroll
+- tapOn:
+    id: password-input
+- inputText: "123456"
+- hideKeyboard
+- tapOn:
+    id: sign-in-button
+- assertVisible: "Logout"

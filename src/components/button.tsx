@@ -20,7 +20,7 @@ function Button({children, isLoading=false, ...rest}: ButtonProps){
     >
       {
         isLoading ? (
-          <ActivityIndicator color={colors.slate[100]} size="small" />
+          <ActivityIndicator color={colors.slate[100]} size="small" testID="loading-indicator"/>
         ) : (
           children
         )
@@ -43,7 +43,7 @@ type IconProps = {
 
 function Icon({icon: Icon}: IconProps){
   return (
-    <Icon color={colors.slate[100]} size={20}/>
+    <Icon color={colors.slate[100]} size={20} testID="button-icon"/>
   )
 }
 
