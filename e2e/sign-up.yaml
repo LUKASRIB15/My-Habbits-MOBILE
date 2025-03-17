@@ -1,0 +1,36 @@
+# SIGN UP STEPS
+# [x] Launch the app with app running
+# [x] Click in "go-to-sign-up" button
+# [x] Click in name input
+# [x] Type name
+# [x] Click in email input
+# [x] Type email
+# [x] Scroll vertically
+# [x] Click in password input
+# [x] Type password
+# [x] Click in "create account" button
+# [x] Assert "Logout" button
+
+appId: com.myHabbits.app
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    stopApp: false
+- tapOn:
+    id: go-to-sign-up-button
+- tapOn:
+    id: name-input
+- inputText: "John Doe"
+- tapOn:
+    id: email-input
+- inputRandomEmail
+- scroll
+- tapOn:
+    id: password-input
+- inputRandomNumber:
+    length: 8
+- hideKeyboard
+- tapOn:
+    id: sign-up-button
+- assertVisible: "Logout"
