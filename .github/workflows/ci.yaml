@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 17
           distribution: 'temurin'
 
       - name: Install dependencies
@@ -40,7 +40,7 @@ jobs:
 
       - name: Set Gradlew Permissions
         run: chmod +x android/gradlew
-        
+
       - run: cd android && ./gradlew assembleDebug
       - uses: mobile-dev-inc/action-maestro-cloud@v1
         with:
