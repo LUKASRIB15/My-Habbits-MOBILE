@@ -34,6 +34,13 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+      
+      - name: Install Android dependencies
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install \
+            "platform-tools" "platforms;android-29" \
+            "system-images;android-29;google_apis;x86" \
+            "emulator"
 
       - name: Download and Create Android Emulator Image
         run: |
