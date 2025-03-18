@@ -34,6 +34,8 @@ jobs:
         with:
           java-version: 11
           distribution: 'temurin'
+      - name: Set Gradlew Permissions
+        run: chmod +x android/gradlew
       - run: cd android && ./gradlew assembleDebug
       - uses: mobile-dev-inc/action-maestro-cloud@v1
         with:
