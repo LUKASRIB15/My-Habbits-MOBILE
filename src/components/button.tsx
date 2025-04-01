@@ -12,7 +12,7 @@ function Button({children, isLoading=false, ...rest}: ButtonProps){
   return (
     <TouchableOpacity
       className={twMerge(
-        "bg-blue-600 rounded-md p-4 items-center",
+        "bg-blue-600 rounded-md p-4 items-center flex-row gap-x-2 justify-center",
         (isLoading || rest.disabled) && "opacity-70"
       )}
       activeOpacity={0.7}

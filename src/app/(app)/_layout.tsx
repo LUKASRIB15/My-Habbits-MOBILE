@@ -2,7 +2,7 @@ import { Loading } from "@/components/loading";
 import { useSessions } from "@/contexts/sessions";
 import { Redirect, Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import colors from "tailwindcss/colors";
 
 export default function AppLayout() {
   const {userLogged} = useSessions()
@@ -20,12 +20,20 @@ export default function AppLayout() {
     return <Loading />; 
   }
 
+
   if(!userLogged){
     return <Redirect href="/sign-in" />
   }
 
   return (
-    <Stack/>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: colors.slate[950]
+        }
+      }}
+    />
   )
 }
 
