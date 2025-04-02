@@ -20,10 +20,10 @@ export default function AppLayout() {
     return <Loading />; 
   }
 
-
-  if(!userLogged){
-    return <Redirect href="/sign-in" />
-  }
+  /* ONLY TO DEVELOPMENT */
+  // if(!userLogged){
+  //   return <Redirect href="/sign-in" />
+  // }
 
   return (
     <Stack

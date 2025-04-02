@@ -1,16 +1,18 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import PersonCircleSvg from "@/assets/icons/person-circle.svg"
 import LogoSvg from "@/assets/logo.svg"
-import { ArrowRight, List } from "phosphor-react-native";
+import { ArrowRight, List, Plus } from "phosphor-react-native";
 import colors from "tailwindcss/colors";
 import * as Check from "@/components/check"
 import { LinearGradient } from "expo-linear-gradient";
 import { Button } from "@/components/button";
 import { useSessions } from "@/contexts/sessions";
+import { useRouter } from "expo-router";
 
 const habits = [{status: true, title: "Beber água"}, {status: true, title: "Beber água 2"},{status: true, title: "Beber água 3"},{status: true, title: "Exercício"}, {status: false, title: "Se alimentar bem"},{status: false, title: "Dormir"}]
 export default function Home(){
   const {signOut} = useSessions()
+  const router = useRouter()
 
   return (
     <View className="flex-1">
@@ -47,7 +49,7 @@ export default function Home(){
                   <Text className="font-rajdhani-medium text-xl text-slate-400">Hoje</Text>
                   <Text className="font-inter-extrabold text-3xl text-slate-100">31/01</Text>
                 </View>
-                <Button>
+                <Button onPress={()=> router.navigate('/specific-day')}>
                   <Button.Title>Ver hábitos</Button.Title>
                   <Button.Icon icon={ArrowRight}/>
                 </Button>
@@ -56,6 +58,12 @@ export default function Home(){
           </View>
         </View>
       </View>
+      <Button 
+        onPress={()=>router.navigate('/new-habit')}
+        className="absolute bottom-8 right-4 bg-blue-600 px-5 py-5 rounded-full"
+      >
+        <Button.Icon icon={Plus} size={24} weight="bold"/>
+      </Button>
     </View>
   )
 }
