@@ -7,12 +7,21 @@ import * as Check from "@/components/check"
 import { LinearGradient } from "expo-linear-gradient";
 import { Button } from "@/components/button";
 import { useSessions } from "@/contexts/sessions";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback } from "react";
+import dayjs from "@/lib/dayjs";
+import { useHabits } from "@/contexts/habits";
 
-const habits = [{status: true, title: "Beber água"}, {status: true, title: "Beber água 2"},{status: true, title: "Beber água 3"},{status: true, title: "Exercício"}, {status: false, title: "Se alimentar bem"},{status: false, title: "Dormir"}]
 export default function Home(){
+  const {possibleHabitsOfDay, completedHabitsOfDay, fetchHabitsOfDay} = useHabits()
   const {signOut} = useSessions()
   const router = useRouter()
+
+  const today = dayjs().startOf('day').toDate()
+
+  useFocusEffect(useCallback(()=>{
+    fetchHabitsOfDay()
+  }, []))
 
   return (
     <View className="flex-1">
@@ -33,9 +42,9 @@ export default function Home(){
           <Text className="text-2xl text-slate-100 font-rajdhani-bold">Hábitos do dia</Text>
           <View className="gap-y-3 h-[208]  overflow-hidden">
             {
-              habits.map((habit)=> (
-                <Check.Root key={habit.title}>
-                  <Check.Box isChecked={habit.status}/>
+              possibleHabitsOfDay.map((habit)=> (
+                <Check.Root key={habit.id}>
+                  <Check.Box isChecked={completedHabitsOfDay.includes(habit.id)}/>
                   <Check.Title>{habit.title}</Check.Title>
                 </Check.Root>
               ))
@@ -47,9 +56,12 @@ export default function Home(){
               <View className="flex-row items-end justify-between">
                 <View>
                   <Text className="font-rajdhani-medium text-xl text-slate-400">Hoje</Text>
-                  <Text className="font-inter-extrabold text-3xl text-slate-100">31/01</Text>
+                  <Text className="font-inter-extrabold text-3xl text-slate-100">{dayjs(today).format('DD/MM')}</Text>
                 </View>
-                <Button onPress={()=> router.navigate('/specific-day')}>
+                <Button onPress={()=> router.navigate({
+                  pathname: '/specific-day/[date]',
+                  params: {date: today.toISOString()}
+                })}>
                   <Button.Title>Ver hábitos</Button.Title>
                   <Button.Icon icon={ArrowRight}/>
                 </Button>

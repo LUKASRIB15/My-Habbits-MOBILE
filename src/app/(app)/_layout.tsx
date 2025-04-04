@@ -1,4 +1,5 @@
 import { Loading } from "@/components/loading";
+import HabitsProvider from "@/contexts/habits";
 import { useSessions } from "@/contexts/sessions";
 import { Redirect, Stack } from "expo-router";
 import { useEffect, useState } from "react";
@@ -20,20 +21,21 @@ export default function AppLayout() {
     return <Loading />; 
   }
 
-  /* ONLY TO DEVELOPMENT */
-  // if(!userLogged){
-  //   return <Redirect href="/sign-in" />
-  // }
+  if(!userLogged){
+    return <Redirect href="/sign-in" />
+  }
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: {
-          backgroundColor: colors.slate[950]
-        }
-      }}
-    />
+    <HabitsProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: colors.slate[950]
+          }
+        }}
+      />
+    </HabitsProvider>
   )
 }
 
