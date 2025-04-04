@@ -5,16 +5,89 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import colors from "tailwindcss/colors";
 import * as Check from "@/components/check"
 import { Button } from "@/components/button";
+import { days } from "@/data/days";
+import { Controller, useForm } from "react-hook-form";
+import * as zod from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
+import { useHabits } from "@/contexts/habits";
+import Toast from "react-native-toast-message";
+import { ToastMessage } from "@/components/toast-message";
+import { twMerge } from "tailwind-merge";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-const days = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"]
+const newHabitFormSchema = zod.object({
+  title: zod.string(),
+  weekDays: zod.array(zod.number())
+})
+
+type NewHabitFormData = zod.infer<typeof newHabitFormSchema>
 
 export default function NewHabit(){
-  const [weekDays, setWeekDays] = useState<number[]>([])  
+  const [isLoading, setIsLoading] = useState(false)
+  const {control, handleSubmit, setValue, watch} = useForm<NewHabitFormData>({
+    defaultValues: {
+      weekDays: [],
+      title: ''
+    },
+    resolver: zodResolver(newHabitFormSchema)
+  }) 
   const router = useRouter()
+  const {createHabit} = useHabits()
+  
+  const weekDays = watch("weekDays")
+  const isInvalidForm = watch("title").trim().length === 0 || watch("title").length > 20|| weekDays.length === 0
+
+  function handleToggleWeekDay(weekDay: number){
+    const updatedWeekDays = weekDays.includes(weekDay) ?
+      weekDays.filter(value => value !== weekDay) :
+      [...weekDays, weekDay]
+      
+    setValue("weekDays", updatedWeekDays)
+    
+  }
+
+  async function handleCreateNewHabit(data: NewHabitFormData){
+    try{
+      setIsLoading(true)
+      const {title, weekDays} = data
+
+      await createHabit(title, weekDays)
+
+      router.back()
+    }catch(error){
+      if(error instanceof AxiosError){
+        const status = error.response?.status ?? 500
+
+        switch(status){
+          case 400:
+            Toast.show({
+              type: 'error',
+              text1: 'Você não pode criar um hábito sem selecionar pelo menos um dia da semana.'
+            })
+            break
+          case 401:
+            Toast.show({
+              type: 'error',
+              text1: 'Você não está autorizado para criar hábitos. Saia e realize login novamente!',
+            })
+            break
+          default:
+            Toast.show({
+              type: 'error',
+              text1: 'Ops! Ocorreu um erro ao criar seu hábito, tente novamente mais tarde',
+            })
+        }
+        
+      }
+    }finally{
+      setIsLoading(false)
+    }
+  }
 
   return (
     <View className="flex-1">
-      <View className="pt-12 flex-row justify-between px-5">
+      <View className="pt-12 flex-row justify-between px-5 pb-4">
         <TouchableOpacity activeOpacity={0.7} onPress={()=>router.back()}>
           <ArrowLeft size={32} color={colors.slate[100]}/>
         </TouchableOpacity>
@@ -22,36 +95,73 @@ export default function NewHabit(){
           <Text className="font-rajdhani-medium text-xl text-slate-100">Novo hábito</Text>
         </View>
       </View>
-      <View className="flex-1 px-5 py-8 gap-y-6">
-        <Text className="font-inter-extrabold text-3xl text-slate-100">Criar hábito</Text>
-        <View className="gap-y-4">
-          <Text className="text-slate-100 text-base font-inter-semibold">Qual o seu comprometimento?</Text>
-          <TextInput 
-            className="bg-slate-800 border-2 border-slate-700 rounded-lg p-4 h-[52] text-slate-100"
-            placeholder="Exercícios, estudar por 2h, ..."
-            placeholderTextColor={colors.slate[400]}
-          />
-        </View>
-        <View className="gap-y-4">
-          <Text className="text-slate-100 text-base font-inter-semibold">Qual a recorrência?</Text>
-          <View className="gap-y-3">
-            {
-              days.map((day, index)=>(
-                <Check.Root key={day}>
-                  <Check.Box 
-                    isChecked={weekDays.includes(index+1)}
-                    onCheckChange={()=> weekDays.includes(index+1) ? setWeekDays(weekDays.filter(day => day !== index+1)) : setWeekDays([...weekDays, index+1])}
+      <KeyboardAwareScrollView>
+        <View className="flex-1 px-5 py-8 gap-y-6">
+          <Text className="font-inter-extrabold text-3xl text-slate-100">Criar hábito</Text>
+          <View className="gap-y-4">
+            <Text className="text-slate-100 text-base font-inter-semibold">Qual o seu comprometimento?</Text>
+            <Controller
+              control={control}
+              name="title" 
+              render={({field})=>(
+                <View className="gap-y-1">
+                  <TextInput 
+                    className={
+                      twMerge(
+                        "bg-slate-800 border-2 border-slate-700 rounded-lg p-4 h-[52] text-slate-100",
+                        field.value.length > 20 && "border-red-500"
+                      )
+                    }
+                    placeholder="Exercícios, estudar por 2h, ..."
+                    placeholderTextColor={colors.slate[400]}
+                    value={field.value}
+                    onChangeText={field.onChange}
                   />
-                  <Check.Title>{day}</Check.Title>
-                </Check.Root>
-              ))
-            }
+                  <Text className={twMerge("text-xs text-slate-400", field.value.length > 20 && "text-red-500")}>{field.value.length}/20</Text>  
+                </View>
+
+              )}  
+            />
           </View>
+          <View className="gap-y-4">
+            <Text className="text-slate-100 text-base font-inter-semibold">Qual a recorrência?</Text>
+            <View className="gap-y-3">
+              {
+                days.map((day)=>(
+                  <Controller 
+                    key={day.value}
+                    control={control}
+                    name="weekDays"
+                    render={()=>(
+                      <Check.Root>
+                        <Check.Box 
+                          isChecked={weekDays.includes(day.value)}
+                          onCheckChange={()=> handleToggleWeekDay(day.value)}
+                        />
+                        <Check.Title>{day.name}</Check.Title>
+                      </Check.Root>
+                    )}
+                  />
+                ))
+              }
+            </View>
+          </View>
+          <Button 
+            variant="secondary" 
+            onPress={handleSubmit(handleCreateNewHabit)}
+            isLoading={isLoading}
+            disabled={isInvalidForm}
+          >
+            <Button.Title>Criar hábito</Button.Title>
+          </Button>
         </View>
-        <Button variant="secondary">
-          <Button.Title>Criar hábito</Button.Title>
-        </Button>
-      </View>
+      </KeyboardAwareScrollView>
+      {/* Toast Notification */}
+      <Toast 
+        config={{
+          error: (props)=><ToastMessage message={props.text1}/>
+        }}
+      />
     </View>
   )
 }

@@ -19,7 +19,8 @@ type BoxProps = {
 
 function Box({isChecked = false, onCheckChange}: BoxProps){
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
+      activeOpacity={0.7} 
       className={twMerge(
         "w-8 h-8 border-2 border-slate-700 rounded-lg bg-slate-800 items-center",
         isChecked && "border-emerald-400 bg-emerald-700"
