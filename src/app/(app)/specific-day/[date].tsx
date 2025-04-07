@@ -8,25 +8,43 @@ import { AxiosError } from "axios";
 import Toast from "react-native-toast-message";
 import dayjs from "@/lib/dayjs";
 import { useEffect } from "react";
+import { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 export default function SpecificDay(){
   const { fetchHabitsOfDay } = useHabits()
   const {date} = useLocalSearchParams() as {date: string}
-
+  const progressBar = useSharedValue(0)
+  
   /* Manipulation with dates */
   const dayAndMonth = dayjs(new Date(date)).format('DD/MM')
   const dayOfWeek = dayjs(new Date(date)).format('dddd')
   const month = dayjs(new Date(date)).format('MMMM')
   const year = dayjs(new Date(date)).format('YYYY') 
-
+  
   const { possibleHabitsOfDay, completedHabitsOfDay, toggleHabit } = useHabits()
-
+  
   const progressBarPercentage = possibleHabitsOfDay.length !== 0 ? (100 * completedHabitsOfDay.length) / possibleHabitsOfDay.length : 0
+  
   const router = useRouter()
+
+  const animationProgressBarStyle = useAnimatedStyle(()=>({
+    width: `${progressBar.value}%`
+  }))
 
   useEffect(()=>{
     fetchHabitsOfDay(new Date(date))
   }, [])
+
+  useEffect(()=>{
+    progressBar.value = withTiming(
+      progressBarPercentage, 
+      {
+        duration: 250, 
+        easing: Easing.inOut(Easing.linear)
+      }
+    )
+  }, [progressBarPercentage])
 
   async function handleToggleHabit(habitId: string){
     try{
@@ -78,9 +96,9 @@ export default function SpecificDay(){
               <Text className="text-3xl text-slate-100 font-inter-extrabold">{dayAndMonth}</Text>
             </View>
             <View className="w-full h-3 bg-slate-700 rounded-full">
-              <View 
+              <Animated.View 
                 className="h-3 bg-blue-600 rounded-full"
-                style={{width: `${progressBarPercentage}%`}}
+                style={animationProgressBarStyle}
               />
             </View>
           </View>
