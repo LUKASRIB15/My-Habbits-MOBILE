@@ -2,7 +2,6 @@ import { ArrowLeft } from "phosphor-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 import colors from "tailwindcss/colors";
 import * as Check from "@/components/check"
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { useHabits } from "@/contexts/habits";
 import { AxiosError } from "axios";
 import Toast from "react-native-toast-message";
@@ -10,10 +9,14 @@ import dayjs from "@/lib/dayjs";
 import { useEffect } from "react";
 import { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import Animated from "react-native-reanimated";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { PrivateNavigatorRoutesProps } from "@/routes/private.routes";
 
-export default function SpecificDay(){
+export function SpecificDay(){
   const { fetchHabitsOfDay } = useHabits()
-  const {date} = useLocalSearchParams() as {date: string}
+  const navigator = useNavigation<PrivateNavigatorRoutesProps>()
+  const route = useRoute()
+  const {date} = route.params as { date: string }
   const progressBar = useSharedValue(0)
   
   /* Manipulation with dates */
@@ -25,8 +28,6 @@ export default function SpecificDay(){
   const { possibleHabitsOfDay, completedHabitsOfDay, toggleHabit } = useHabits()
   
   const progressBarPercentage = possibleHabitsOfDay.length !== 0 ? (100 * completedHabitsOfDay.length) / possibleHabitsOfDay.length : 0
-  
-  const router = useRouter()
 
   const animationProgressBarStyle = useAnimatedStyle(()=>({
     width: `${progressBar.value}%`
@@ -80,7 +81,7 @@ export default function SpecificDay(){
   return (
     <View className="flex-1">
       <View className="pt-12 flex-row justify-between px-5">
-        <TouchableOpacity activeOpacity={0.7} onPress={()=>router.back()}>
+        <TouchableOpacity activeOpacity={0.7} onPress={()=>navigator.goBack()}>
           <ArrowLeft size={32} color={colors.slate[100]}/>
         </TouchableOpacity>
         <View className="items-end">

@@ -4,18 +4,19 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { LinearGradient } from "expo-linear-gradient";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/input";
-import { ArrowLeft, ArrowRight, Envelope, LockKey, User } from "phosphor-react-native";
+import { ArrowLeft, Envelope, LockKey, User } from "phosphor-react-native";
 import { Button } from "@/components/button";
 import colors from "tailwindcss/colors";
 import * as zod from "zod"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import Toast from "react-native-toast-message";
 import { ToastMessage } from "@/components/toast-message";
 import { useSessions } from "@/contexts/sessions";
 import { AxiosError } from "axios";
 import * as Haptics from "expo-haptics"
+import { useNavigation } from "@react-navigation/native";
+import { PublicNavigatorRoutesProps } from "@/routes/public.routes";
 
 const APP_BAR = 50
 
@@ -27,10 +28,10 @@ const signUpFormSchema = zod.object({
 
 type SignUpFormData = zod.infer<typeof signUpFormSchema>
 
-export default function SignUp() {
+export function SignUp() {
   const [isLoading, setIsLoading] = useState(false)
   const {signUp} = useSessions()
-  const router = useRouter()
+  const navigator = useNavigation<PublicNavigatorRoutesProps>()
   const nameInputRef = useRef<TextInput>(null)
   const emailInputRef = useRef<TextInput>(null)
   const passwordInputRef = useRef<TextInput>(null)
@@ -51,7 +52,6 @@ export default function SignUp() {
       const {name, email, password} = data
 
       await signUp(name, email, password)
-      router.replace('/')
     }catch(error){
       if(error instanceof AxiosError){
         const status = error.response?.status ?? 500
@@ -166,7 +166,7 @@ export default function SignUp() {
                 </Button>
               </View>
               <TouchableOpacity 
-                onPress={()=> router.back()}
+                onPress={()=> navigator.goBack()}
                 className="flex-row items-center gap-x-1"
               >
                 <ArrowLeft color={colors.slate[100]} size={14}/>

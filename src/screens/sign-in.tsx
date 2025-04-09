@@ -10,12 +10,13 @@ import { Controller, useForm } from "react-hook-form";
 import * as zod from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRef, useState } from "react";
-import { useRouter } from "expo-router";
 import { AxiosError } from "axios";
 import Toast from "react-native-toast-message"
 import { ToastMessage } from "@/components/toast-message";
 import { useSessions } from "@/contexts/sessions";
 import * as Haptics from "expo-haptics"
+import { useNavigation } from "@react-navigation/native";
+import { PublicNavigatorRoutesProps } from "@/routes/public.routes";
 
 const APP_BAR = 50
 
@@ -26,10 +27,10 @@ const signInFormSchema = zod.object({
 
 type SignInFormData = zod.infer<typeof signInFormSchema>
 
-export default function SignIn(){
+export function SignIn(){
   const [isLoading, setIsLoading] = useState(false)
   const {signIn} = useSessions()
-  const router = useRouter()
+  const navigator = useNavigation<PublicNavigatorRoutesProps>()
   const emailInputRef = useRef<TextInput>(null)
   const passwordInputRef = useRef<TextInput>(null)
   const screenHeight = useWindowDimensions().height
@@ -48,7 +49,6 @@ export default function SignIn(){
       setIsLoading(true)
       const {email, password} = data
       await signIn(email, password)
-      router.replace('/')
     }catch(error){
       if(error instanceof AxiosError){
         const status = error.response?.status ?? 500
@@ -146,7 +146,7 @@ export default function SignIn(){
                 </Button>
               </View>
               <TouchableOpacity 
-                onPress={()=> router.navigate('/sign-up')}
+                onPress={()=> navigator.navigate('signUp')}
                 className="flex-row items-center gap-x-1"
                 testID="go-to-sign-up-button"
               >

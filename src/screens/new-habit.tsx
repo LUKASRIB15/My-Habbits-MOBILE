@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+
 import { ArrowLeft } from "phosphor-react-native";
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -15,6 +15,7 @@ import Toast from "react-native-toast-message";
 import { ToastMessage } from "@/components/toast-message";
 import { twMerge } from "tailwind-merge";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useNavigation } from "@react-navigation/native";
 
 const newHabitFormSchema = zod.object({
   title: zod.string(),
@@ -23,7 +24,7 @@ const newHabitFormSchema = zod.object({
 
 type NewHabitFormData = zod.infer<typeof newHabitFormSchema>
 
-export default function NewHabit(){
+export function NewHabit(){
   const [isLoading, setIsLoading] = useState(false)
   const {control, handleSubmit, setValue, watch} = useForm<NewHabitFormData>({
     defaultValues: {
@@ -32,7 +33,7 @@ export default function NewHabit(){
     },
     resolver: zodResolver(newHabitFormSchema)
   }) 
-  const router = useRouter()
+  const navigator = useNavigation()
   const {createHabit} = useHabits()
   
   const weekDays = watch("weekDays")
@@ -54,7 +55,7 @@ export default function NewHabit(){
 
       await createHabit(title, weekDays)
 
-      router.back()
+      navigator.goBack()
     }catch(error){
       if(error instanceof AxiosError){
         const status = error.response?.status ?? 500
@@ -88,7 +89,7 @@ export default function NewHabit(){
   return (
     <View className="flex-1">
       <View className="pt-12 flex-row justify-between px-5 pb-4">
-        <TouchableOpacity activeOpacity={0.7} onPress={()=>router.back()}>
+        <TouchableOpacity activeOpacity={0.7} onPress={()=>navigator.goBack()}>
           <ArrowLeft size={32} color={colors.slate[100]}/>
         </TouchableOpacity>
         <View className="items-end">

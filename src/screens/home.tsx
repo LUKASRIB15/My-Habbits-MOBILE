@@ -7,15 +7,16 @@ import * as Check from "@/components/check"
 import { LinearGradient } from "expo-linear-gradient";
 import { Button } from "@/components/button";
 import { useSessions } from "@/contexts/sessions";
-import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 import dayjs from "@/lib/dayjs";
 import { useHabits } from "@/contexts/habits";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { PrivateNavigatorRoutesProps } from "@/routes/private.routes";
 
-export default function Home(){
+export function Home(){
   const {possibleHabitsOfDay, completedHabitsOfDay, fetchHabitsOfDay} = useHabits()
   const {signOut} = useSessions()
-  const router = useRouter()
+  const navigator = useNavigation<PrivateNavigatorRoutesProps>()
 
   const today = dayjs().startOf('day').toDate()
 
@@ -58,9 +59,8 @@ export default function Home(){
                   <Text className="font-rajdhani-medium text-xl text-slate-400">Hoje</Text>
                   <Text className="font-inter-extrabold text-3xl text-slate-100">{dayjs(today).format('DD/MM')}</Text>
                 </View>
-                <Button onPress={()=> router.navigate({
-                  pathname: '/specific-day/[date]',
-                  params: {date: today.toISOString()}
+                <Button onPress={()=> navigator.navigate('specificDay', {
+                  date: today.toISOString()
                 })}>
                   <Button.Title>Ver hábitos</Button.Title>
                   <Button.Icon icon={ArrowRight}/>
@@ -71,7 +71,7 @@ export default function Home(){
         </View>
       </View>
       <Button 
-        onPress={()=>router.navigate('/new-habit')}
+        onPress={()=>navigator.navigate('newHabit')}
         className="absolute bottom-8 right-4 bg-blue-600 px-5 py-5 rounded-full"
       >
         <Button.Icon icon={Plus} size={24} weight="bold"/>
