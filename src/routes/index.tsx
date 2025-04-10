@@ -5,6 +5,7 @@ import { View } from "react-native"
 import { useSessions } from "@/contexts/sessions"
 import { PrivateRoutes } from "./private.routes"
 import HabitsProvider from "@/contexts/habits"
+import { DrawerRoutes } from "./drawer.routes"
 
 export function Routes(){
   const {userLogged} = useSessions()
@@ -14,15 +15,13 @@ export function Routes(){
   const theme = DefaultTheme
   theme.colors.background = colors.slate["950"]
 
-  console.log(userExists)
-
   return (
     <View className="flex-1 bg-slate-950">
       <NavigationContainer theme={theme}>
         {
           userExists ? 
             <HabitsProvider>
-              <PrivateRoutes/> 
+              <DrawerRoutes/> 
             </HabitsProvider>
           : 
             <PublicRoutes/>

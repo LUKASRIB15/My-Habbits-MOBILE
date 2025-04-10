@@ -1,4 +1,5 @@
 import './src/global.css'
+import 'react-native-gesture-handler';
 
 import { useFonts } from "expo-font";
 import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold } from '@expo-google-fonts/inter';
