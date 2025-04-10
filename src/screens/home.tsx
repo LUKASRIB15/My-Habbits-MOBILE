@@ -12,11 +12,12 @@ import dayjs from "@/lib/dayjs";
 import { useHabits } from "@/contexts/habits";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { PrivateNavigatorRoutesProps } from "@/routes/private.routes";
+import { DrawerNavigatorRoutesProps } from "@/routes/drawer.routes";
 
 export function Home(){
   const {possibleHabitsOfDay, completedHabitsOfDay, fetchHabitsOfDay} = useHabits()
   const {signOut} = useSessions()
-  const navigator = useNavigation<PrivateNavigatorRoutesProps>()
+  const navigator = useNavigation<DrawerNavigatorRoutesProps & PrivateNavigatorRoutesProps>()
 
   const today = dayjs().startOf('day').toDate()
 
@@ -34,7 +35,7 @@ export function Home(){
           <PersonCircleSvg width={30} height={30}/>
         </TouchableOpacity>
         <LogoSvg width={32} height={32}/>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigator.openDrawer()}>
           <List size={32} color={colors.slate[100]}/>
         </TouchableOpacity>
       </View>
